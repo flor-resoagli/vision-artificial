@@ -20,3 +20,4 @@ def compare_contours(contour_to_compare, saved_contours, max_diff):
         if cv2.matchShapes(contour_to_compare, contour, cv2.CONTOURS_MATCH_I2, 0) < max_diff:
             return True
     return False
+    
