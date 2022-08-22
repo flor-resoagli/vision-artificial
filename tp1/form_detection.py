@@ -53,6 +53,13 @@ def main():
         _,contour_circle, hierarchy = cv2.findContours(thresh4, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         cnt3=contour_circle
         ###
+        ###TRIANGLE
+        triangle = cv2.imread('../tp1/triangle.jpg')
+        img4 = cv2.cvtColor(triangle, cv2.COLOR_BGR2GRAY)
+        ret5, thresh5 = cv2.threshold(img4, 127, 255, cv2.THRESH_BINARY)
+        _,contour_triangle, hierarchy = cv2.findContours(thresh5, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        cnt4=contour_triangle
+        ###
 
         if len(contours) > 0:
             # biggest_contour = get_biggest_contour(contours=contours)
@@ -64,15 +71,15 @@ def main():
                 if get_contour_area(c)>5000:
                     draw_contours(frame=frame_denoised, contours=[c], color=color_white, thickness=3)        
                     draw_contours(frame=frame, contours=[c], color=color_white, thickness=3)  
-                    # if cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
-                    #     cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)  
-                      
-                    if cv2.matchShapes(c, cnt3[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
-                        cv2.drawContours(frame, [c],-1, (0, 255, 0), 2) 
+                    
+                    # if cv2.matchShapes(c, cnt3[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
+                    #     cv2.drawContours(frame, [c],-1, (0, 255, 0), 2) 
                     if cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
                         cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
                     if cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
                         cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)  
+                    if cv2.matchShapes(c, cnt4[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
+                        cv2.drawContours(frame, [c],-1, (255, 255, 0), 2) 
                      
            
         cv2.imshow('Window', frame_denoised)
