@@ -32,26 +32,48 @@ def main():
         frame_denoised = denoise(frame=adapt_frame, method=cv2.MORPH_ELLIPSE, radius=trackbar_val2)
         contours = get_contours(frame=frame_denoised, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
 
-        ###
+        ###RECTANGLE
         rectangle = cv2.imread('../tp1/rectangle.jpg')
         img = cv2.cvtColor(rectangle, cv2.COLOR_BGR2GRAY)
         ret2, thresh2 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
         _,contour_rect, hierarchy = cv2.findContours(thresh2, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         cnt1=contour_rect
         ###
+        ###SQUARE
+        square = cv2.imread('../tp1/square.jpg')
+        img2 = cv2.cvtColor(square, cv2.COLOR_BGR2GRAY)
+        ret3, thresh3 = cv2.threshold(img2, 127, 255, cv2.THRESH_BINARY)
+        _,contour_square, hierarchy = cv2.findContours(thresh3, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        cnt2=contour_square
+        ###
+        ###CIRCLE
+        circle = cv2.imread('../tp1/circle.jpg')
+        img3 = cv2.cvtColor(circle, cv2.COLOR_BGR2GRAY)
+        ret4, thresh4 = cv2.threshold(img3, 127, 255, cv2.THRESH_BINARY)
+        _,contour_circle, hierarchy = cv2.findContours(thresh4, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        cnt3=contour_circle
+        ###
 
         if len(contours) > 0:
-            biggest_contour = get_biggest_contour(contours=contours)
-            if compare_contours(contour_to_compare=biggest_contour, saved_contours=saved_contours, max_diff=1):
-                draw_contours(frame=frame_denoised, contours=biggest_contour, color=color_blue, thickness=20)
-                draw_contours(frame=frame, contours=biggest_contour, color=color_blue, thickness=20)
+            # biggest_contour = get_biggest_contour(contours=contours)
+            # if compare_contours(contour_to_compare=biggest_contour, saved_contours=saved_contours, max_diff=1):
+            #     draw_contours(frame=frame_denoised, contours=biggest_contour, color=color_blue, thickness=20)
+            #     # draw_contours(frame=frame, contours=biggest_contour, color=color_blue, thickness=20)
 
             for c in contours:
                 if get_contour_area(c)>5000:
-                    draw_contours(frame=frame_denoised, contours=[c], color=color_blue, thickness=3)        
-                    draw_contours(frame=frame, contours=[c], color=color_blue, thickness=3)  
+                    draw_contours(frame=frame_denoised, contours=[c], color=color_white, thickness=3)        
+                    draw_contours(frame=frame, contours=[c], color=color_white, thickness=3)  
+                    # if cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
+                    #     cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)  
+                      
+                    if cv2.matchShapes(c, cnt3[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
+                        cv2.drawContours(frame, [c],-1, (0, 255, 0), 2) 
+                    if cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
+                        cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
                     if cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
-                        cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)      
+                        cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)  
+                     
            
         cv2.imshow('Window', frame_denoised)
         cv2.imshow('Window2',frame )
