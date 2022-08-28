@@ -99,7 +99,7 @@ def main():
 
             min_match = min(match_square, match_triangle, match_circle)
 
-            if min_match < 0.03:
+            if min_match < 0.07:
                 cv.drawContours(image=original_image, contours=[c], contourIdx=-1, color=(0, 255, 0), thickness=3)
                 x, y, w, h = cv.boundingRect(c)
                 text = 'Shape'

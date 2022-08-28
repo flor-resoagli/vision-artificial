@@ -21,6 +21,8 @@ def main():
     create_trackbar(trackbar_name, window_name, slider_max)
     create_trackbar(trackbar_name2, window_name, slider_max2)
 
+    create_trackbar("MATCH", window_name, 10)
+
     saved_contours = []
 
     while True:
@@ -28,7 +30,9 @@ def main():
         gray_frame = apply_color_convertion(frame=frame, color=cv2.COLOR_RGB2GRAY)
         trackbar_val = get_trackbar_value(trackbar_name=trackbar_name, window_name=window_name)
         trackbar_val2 = get_trackbar_value(trackbar_name=trackbar_name2, window_name=window_name)
-        adapt_frame = adaptive_threshold(frame=gray_frame, slider_max=slider_max, adaptative=cv2.ADAPTIVE_THRESH_GAUSSIAN_C, binary=cv2.THRESH_BINARY,trackbar_value=trackbar_val)
+        trackbar_val3 = get_trackbar_value("MATCH", window_name)
+        ret2, adapt_frame = cv2.threshold(gray_frame, trackbar_val, 255, cv2.THRESH_BINARY)
+        # adapt_frame = adaptive_threshold(frame=gray_frame, slider_max=slider_max, adaptative=cv2.ADAPTIVE_THRESH_GAUSSIAN_C, binary=cv2.THRESH_BINARY,trackbar_value=trackbar_val)
         frame_denoised = denoise(frame=adapt_frame, method=cv2.MORPH_ELLIPSE, radius=trackbar_val2)
         contours = get_contours(frame=frame_denoised, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
 
@@ -74,11 +78,11 @@ def main():
                     
                     # if cv2.matchShapes(c, cnt3[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
                     #     cv2.drawContours(frame, [c],-1, (0, 255, 0), 2) 
-                    if cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
+                    if cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
                         cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
-                    if cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
+                    elif cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
                         cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)  
-                    if cv2.matchShapes(c, cnt4[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
+                    elif cv2.matchShapes(c, cnt4[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
                         cv2.drawContours(frame, [c],-1, (255, 255, 0), 2) 
                      
            
