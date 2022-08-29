@@ -78,12 +78,40 @@ def main():
                     
                     # if cv2.matchShapes(c, cnt3[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
                     #     cv2.drawContours(frame, [c],-1, (0, 255, 0), 2) 
-                    if cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
-                        cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
-                    elif cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
-                        cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)  
-                    elif cv2.matchShapes(c, cnt4[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
-                        cv2.drawContours(frame, [c],-1, (255, 255, 0), 2) 
+
+                    match_square = cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0)
+
+                    match_rectangle = cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0)
+
+                    match_triangle = cv2.matchShapes(c, cnt4[1], cv2.CONTOURS_MATCH_I2, 0)
+
+                    min_match = min(match_square, match_rectangle, match_triangle)
+
+                    if(min_match < trackbar_val3/10):
+                        if min_match == match_square:
+                            cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
+                            x, y, w, h = cv2.boundingRect(c)
+                            text = 'Square'
+                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, .5, (255, 255, 255), 1, cv2.LINE_AA)
+
+                        elif min_match == match_rectangle:
+                            cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)
+                            x, y, w, h = cv2.boundingRect(c)
+                            text = 'Rectangle'
+                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, .5, (255, 255, 255), 1, cv2.LINE_AA)
+                        elif min_match == match_triangle:
+                            cv2.drawContours(frame, [c],-1, (255, 255, 0), 2) 
+                            x, y, w, h = cv2.boundingRect(c)
+                            text = 'Triangle'
+                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, .5, (255, 255, 255), 1, cv2.LINE_AA)
+
+
+                    # if cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
+                    #     cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
+                    # if cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
+                    #     cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)  
+                    # if cv2.matchShapes(c, cnt4[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
+                    #     cv2.drawContours(frame, [c],-1, (255, 255, 0), 2) 
                      
            
         cv2.imshow('Window', frame_denoised)
