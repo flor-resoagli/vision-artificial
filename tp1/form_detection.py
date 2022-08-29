@@ -8,8 +8,8 @@ from trackbar import create_trackbar, get_trackbar_value
 def main():
 
     window_name = 'Window'
-    trackbar_name = 'Trackbar'
-    trackbar_name2 = 'Trackbar2'
+    trackbar_name = 'BINARY'
+    trackbar_name2 = 'DENOISE'
     slider_max = 151
     slider_max2 = 20
     cv2.namedWindow(window_name)
@@ -72,9 +72,9 @@ def main():
             #     # draw_contours(frame=frame, contours=biggest_contour, color=color_blue, thickness=20)
 
             for c in contours:
-                if get_contour_area(c)>5000:
+                if get_contour_area(c)>8000 :
                     draw_contours(frame=frame_denoised, contours=[c], color=color_white, thickness=3)        
-                    draw_contours(frame=frame, contours=[c], color=color_white, thickness=3)  
+                    # draw_contours(frame=frame, contours=[c], color=color_white, thickness=3)  
                     
                     # if cv2.matchShapes(c, cnt3[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
                     #     cv2.drawContours(frame, [c],-1, (0, 255, 0), 2) 
@@ -85,25 +85,36 @@ def main():
 
                     match_triangle = cv2.matchShapes(c, cnt4[1], cv2.CONTOURS_MATCH_I2, 0)
 
-                    min_match = min(match_square, match_rectangle, match_triangle)
+                    match_circle = cv2.matchShapes(c, cnt3[1], cv2.CONTOURS_MATCH_I2, 0)
 
-                    if(min_match < trackbar_val3/10):
+                    min_match = min(match_square, match_rectangle, match_triangle, match_circle)
+
+                    if min_match < trackbar_val3/10:
                         if min_match == match_square:
                             cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
                             x, y, w, h = cv2.boundingRect(c)
                             text = 'Square'
-                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, .5, (255, 255, 255), 1, cv2.LINE_AA)
+                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
 
                         elif min_match == match_rectangle:
                             cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)
                             x, y, w, h = cv2.boundingRect(c)
                             text = 'Rectangle'
-                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, .5, (255, 255, 255), 1, cv2.LINE_AA)
+                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
                         elif min_match == match_triangle:
                             cv2.drawContours(frame, [c],-1, (255, 255, 0), 2) 
                             x, y, w, h = cv2.boundingRect(c)
                             text = 'Triangle'
-                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, .5, (255, 255, 255), 1, cv2.LINE_AA)
+                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                        elif min_match == match_circle:
+                            cv2.drawContours(frame, [c],-1, (255, 0, 255), 2) 
+                            x, y, w, h = cv2.boundingRect(c)
+                            text = 'Circle'
+                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                        else:
+                            draw_contours(frame=frame, contours=[c], color=color_white, thickness=3) 
+                    else:
+                        draw_contours(frame=frame, contours=[c], color=color_white, thickness=3) 
 
 
                     # if cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
