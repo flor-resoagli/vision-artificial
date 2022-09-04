@@ -89,7 +89,7 @@ def main():
 
                     min_match = min(match_square, match_rectangle, match_triangle, match_circle)
 
-                    if min_match < trackbar_val3/10:
+                    if min_match < trackbar_val3/10.0:
                         if min_match == match_square:
                             cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
                             x, y, w, h = cv2.boundingRect(c)
