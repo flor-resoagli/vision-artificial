@@ -36,16 +36,20 @@ def denoise(frame, method, radius):
 def get_biggest_contour(contours):
     max_contour = contours[0]
     for contour in contours:
-        if 5000 > cv.contourArea(contour) > cv.contourArea(max_contour):
+        if 8000 > cv.contourArea(contour) > cv.contourArea(max_contour):
             max_contour = contour
     return max_contour
 
 
 def draw_contour_train(contours_from, contours_to):
-    _, contours, hierarchy = cv.findContours(contours_from, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
-    cnt = contours[0]
-    cv.drawContours(contours_to, contours, -1, (0, 255, 255), 7)
-    return contours[0]
+    _, contours, hierarchy = cv.findContours(contours_from, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    if cv.contourArea(contours[1]) > 8000 and cv.contourArea(contours[0]) > 8000:
+        cnt =  contours[1]
+    else:
+        cnt = contours[2]
+    
+    cv.drawContours(contours_to, cnt, -1, (0, 255, 0), 7)
+    return cnt
 
 
 def draw_contours(contours_from, contours_to, value):
