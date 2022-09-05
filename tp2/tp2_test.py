@@ -85,7 +85,12 @@ def main():
                     elif predicted_tag == 2:
                         cv2.drawContours(frame, [c],-1, (255, 0, 255), 2)#MAGENTA
                         x, y, w, h = cv2.boundingRect(c)
-                        text = 'Estrella'
+                        text = 'Star'
+                        cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                    elif predicted_tag == 3:
+                        cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)#MAGENTA
+                        x, y, w, h = cv2.boundingRect(c)
+                        text = 'Circle'
                         cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
 
         cv2.imshow('Window', frame_denoised)

@@ -31,4 +31,4 @@ def generate_hu(where_to_write, min, max):
         writer.writerows(final_data)
 
 
-generate_hu('./descriptores.csv', 2, 36)
+generate_hu('./descriptores.csv', 2, 46)
