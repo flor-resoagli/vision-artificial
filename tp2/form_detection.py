@@ -3,6 +3,17 @@ import cv2
 from contour import get_contours, get_biggest_contour, compare_contours, get_contour_area
 from frame_editor import apply_color_convertion, adaptive_threshold, denoise, draw_contours
 from trackbar import create_trackbar, get_trackbar_value
+from math import copysign, log10
+
+from joblib import load
+
+
+def get_hu_moments(contour):
+    moments = cv2.moments(contour)
+    hu_moments = cv2.HuMoments(moments)
+    for i in range(len(hu_moments)):
+        hu_moments[i] = -1 * copysign(1.0, hu_moments[i]) * log10(abs(hu_moments[i]))
+    return hu_moments
 
 
 def main():
@@ -25,6 +36,10 @@ def main():
 
     saved_contours = []
 
+    # carga el modelo
+    clasificador = load('filename.joblib') 
+
+
     while True:
         ret, frame = cap.read()
         gray_frame = apply_color_convertion(frame=frame, color=cv2.COLOR_RGB2GRAY)
@@ -36,34 +51,7 @@ def main():
         frame_denoised = denoise(frame=adapt_frame, method=cv2.MORPH_ELLIPSE, radius=trackbar_val2)
         contours = get_contours(frame=frame_denoised, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
 
-        ###RECTANGLE
-        rectangle = cv2.imread('../tp1/rectangle.jpg')
-        img = cv2.cvtColor(rectangle, cv2.COLOR_BGR2GRAY)
-        ret2, thresh2 = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
-        _,contour_rect, hierarchy = cv2.findContours(thresh2, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        cnt1=contour_rect
-        ###
-        ###SQUARE
-        square = cv2.imread('../tp1/square.jpg')
-        img2 = cv2.cvtColor(square, cv2.COLOR_BGR2GRAY)
-        ret3, thresh3 = cv2.threshold(img2, 127, 255, cv2.THRESH_BINARY)
-        _,contour_square, hierarchy = cv2.findContours(thresh3, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        cnt2=contour_square
-        ###
-        ###CIRCLE
-        circle = cv2.imread('../tp1/circle.jpg')
-        img3 = cv2.cvtColor(circle, cv2.COLOR_BGR2GRAY)
-        ret4, thresh4 = cv2.threshold(img3, 127, 255, cv2.THRESH_BINARY)
-        _,contour_circle, hierarchy = cv2.findContours(thresh4, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        cnt3=contour_circle
-        ###
-        ###TRIANGLE
-        triangle = cv2.imread('../tp1/triangle.jpg')
-        img4 = cv2.cvtColor(triangle, cv2.COLOR_BGR2GRAY)
-        ret5, thresh5 = cv2.threshold(img4, 127, 255, cv2.THRESH_BINARY)
-        _,contour_triangle, hierarchy = cv2.findContours(thresh5, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        cnt4=contour_triangle
-        ###
+       
 
         if len(contours) > 0:
             # biggest_contour = get_biggest_contour(contours=contours)
@@ -74,48 +62,30 @@ def main():
             for c in contours:
                 if get_contour_area(c)>8000 :
                     draw_contours(frame=frame_denoised, contours=[c], color=color_white, thickness=3)        
-                    # draw_contours(frame=frame, contours=[c], color=color_white, thickness=3)  
                     
-                    # if cv2.matchShapes(c, cnt3[1], cv2.CONTOURS_MATCH_I2, 0) < 0.4:
-                    #     cv2.drawContours(frame, [c],-1, (0, 255, 0), 2) 
+                    hu_moments = get_hu_moments(contour=c)
 
-                    match_square = cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0)
+                    etiquetaPredicha = clasificador.predict(hu_moments)
 
-                    match_rectangle = cv2.matchShapes(c, cnt1[1], cv2.CONTOURS_MATCH_I2, 0)
+                    if etiquetaPredicha == 0:
+                        cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
+                        x, y, w, h = cv2.boundingRect(c)
+                        text = 'Square'
+                        cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
 
-                    match_triangle = cv2.matchShapes(c, cnt4[1], cv2.CONTOURS_MATCH_I2, 0)
-
-                    match_circle = cv2.matchShapes(c, cnt3[1], cv2.CONTOURS_MATCH_I2, 0)
-
-                    min_match = min(match_square, match_rectangle, match_triangle, match_circle)
-
-                    if min_match < trackbar_val3/10:
-                        if min_match == match_square:
-                            cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
-                            x, y, w, h = cv2.boundingRect(c)
-                            text = 'Square'
-                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
-
-                        elif min_match == match_rectangle:
-                            cv2.drawContours(frame, [c],-1, (0, 0, 255), 2)
-                            x, y, w, h = cv2.boundingRect(c)
-                            text = 'Rectangle'
-                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
-                        elif min_match == match_triangle:
-                            cv2.drawContours(frame, [c],-1, (255, 255, 0), 2) 
-                            x, y, w, h = cv2.boundingRect(c)
-                            text = 'Triangle'
-                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
-                        elif min_match == match_circle:
-                            cv2.drawContours(frame, [c],-1, (255, 0, 255), 2) 
-                            x, y, w, h = cv2.boundingRect(c)
-                            text = 'Circle'
-                            cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
-                        else:
-                            draw_contours(frame=frame, contours=[c], color=color_white, thickness=3) 
+                    elif etiquetaPredicha == 1:
+                        cv2.drawContours(frame, [c],-1, (255, 255, 0), 2) 
+                        x, y, w, h = cv2.boundingRect(c)
+                        text = 'Triangle'
+                        cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                    elif etiquetaPredicha == 2:
+                        cv2.drawContours(frame, [c],-1, (255, 0, 255), 2) 
+                        x, y, w, h = cv2.boundingRect(c)
+                        text = 'Estrella'
+                        cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
                     else:
                         draw_contours(frame=frame, contours=[c], color=color_white, thickness=3) 
-
+                    
 
                     # if cv2.matchShapes(c, cnt2[1], cv2.CONTOURS_MATCH_I2, 0) < trackbar_val3/10:
                     #     cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
