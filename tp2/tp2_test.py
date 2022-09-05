@@ -55,25 +55,45 @@ def main():
 
                     
 
-                    moments = cv2.moments(c)
+                    # moments = cv2.moments(c)
 
             
-                    hu_moments = cv2.HuMoments(moments)
+                    hu_moments = get_hu_moments(c)
 
-                    print(hu_moments)
+                    # print("hu ->")
+                    # print(hu_moments)
 
 
-                    predicted_tag = clasificador.predict(hu_moments)
+                    predicted_tag = clasificador.predict(hu_moments.reshape(-1, 7))
 
-                    print(predicted_tag)
+                    # hu_moments[0], hu_moments[1], hu_moments[2], hu_moments[3], hu_moments[4], hu_moments[5], hu_moments[6]
 
-                    # if predicted_tag == 0:
+                    # print(predicted_tag)
 
-                    #     cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)
-                    #     x, y, w, h = cv2.boundingRect(c)
-                    #     text = 'Square'
-                    #     cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+                    if predicted_tag == 0:
 
+                        cv2.drawContours(frame, [c],-1, (255, 0, 0), 2)#BLUE
+                        x, y, w, h = cv2.boundingRect(c)
+                        text = 'Square'
+                        cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA) 
+
+                    elif predicted_tag == 1:
+                        cv2.drawContours(frame, [c],-1, (255, 255, 0), 2)#CYAN
+                        x, y, w, h = cv2.boundingRect(c)
+                        text = 'Triangle'
+                        cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA) 
+                    elif predicted_tag == 2:
+                        cv2.drawContours(frame, [c],-1, (255, 0, 255), 2)#MAGENTA
+                        x, y, w, h = cv2.boundingRect(c)
+                        text = 'Estrella'
+                        cv2.putText(frame, text, (x, y), cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
+
+        cv2.imshow('Window', frame_denoised)
+        cv2.imshow('Window2',frame )
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
 
 
 main()
